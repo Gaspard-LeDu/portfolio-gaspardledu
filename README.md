@@ -1,4 +1,4 @@
-# 💼 Portfolio
+# 💼 Portfolio 💼
 
 Bonjour et bienvenue sur mon portfolio GitHub!
 Je suis **Gaspard Le Du**, étudiant en Sciences Sociales (Sciences Po Rennes, Master R.E.S.S.P), et futur étudiant en **data science** et **compliance**.
