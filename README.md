@@ -11,7 +11,9 @@ Je suis **Gaspard Le Du**, étudiant en Sciences Sociales (Sciences Po Rennes, M
 ## 📂 Projets accessibles
 - **Mémoire de fin d'étude** : *Titre* – méthode - Résultats
 - **Commande publique** : *Titre* - méthode - Résultats
-- **Projet d'introduction aux méthodes statistiques** : *Partage des tâches ménagères & Convictions politiques* - nettoyage de données, recodage, analyse univariée, analyse bivariée, tableaux croisés, régression linéaire  - (16/20)
+- **Projet d'introduction aux méthodes statistiques** : *"Partage des tâches ménagères & Convictions politiques"*
+nettoyage de données, recodage, analyse univariée, analyse bivariée, tableaux croisés, régression linéaire
+(16/20)
 - **Travaux de groupe** : *Titre* - méthode - Résultats
 
 ## 📬 Contact
