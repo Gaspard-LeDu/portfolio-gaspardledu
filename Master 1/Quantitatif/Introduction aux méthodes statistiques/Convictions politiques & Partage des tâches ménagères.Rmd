@@ -21,7 +21,7 @@ dataFRA <- subset(dataTTL, V3 == "FR-France")
 # On recode donc certaines réponses au questionnaire en variables quantitatives
 # Exemple : "Le rôle d’un homme, c’est de gagner l’argent du ménage ; le rôle d’une femme, c’est de s’occuper de la maison et de la famille" (Question 2 - 0 à 4 points)
 
-# Recodage de dataFRA$V7 en dataFRA$V7_rec
+# Recodage de la question 2 ("Le rôle d’un homme, c’est de gagner l’argent du ménage ; le rôle d’une femme, c’est de s’occuper de la maison et de la famille")
 dataFRA$V7_rec <- dataFRA$V7 %>%
   fct_recode(
     "4" = "Strongly agree",
@@ -33,18 +33,19 @@ dataFRA$V7_rec <- dataFRA$V7 %>%
   as.character() %>%
   as.numeric()
 
-# Recodage de dataFRA$V8 en dataFRA$V8_rec
+# Recodage de la question 4 (Il n’y a pas de problème pour un couple à vivre ensemble sans avoir l’intention de se marier
 dataFRA$V8_rec <- dataFRA$V8 %>%
   fct_recode(
-    "4" = "Strongly agree",
-    "3" = "Agree",
+    "0" = "Strongly agree",
+    "0" = "Agree",
     "1" = "Neither agree nor disagree",
-    "0" = "Disagree",
-    "0" = "Strongly disagree"
+    "3" = "Disagree",
+    "4" = "Strongly disagree"
   ) %>%
   as.character() %>%
   as.numeric()
 # etc, etc...
+# On suit la même procédure pour chaque question portant sur les convictions du répondant
 
 # On additionne ensuite tous les points obtenus pour former une échelle de conservatisme (échelle CONSERV)
 dataFRA$scoreCONSERV <- dataFRA$V7_rec+dataFRA$V8_rec+dataFRA$V9_rec+dataFRA$V10_rec+dataFRA$V11_rec+dataFRA$V15_rec+dataFRA$V16_rec+dataFRA$V17_rec+dataFRA$V19_rec+dataFRA$V20_rec+dataFRA$V31_rec+dataFRA$V32_rec+dataFRA$FR_PRTY_rec+dataFRA$PARTY_LR_rec
