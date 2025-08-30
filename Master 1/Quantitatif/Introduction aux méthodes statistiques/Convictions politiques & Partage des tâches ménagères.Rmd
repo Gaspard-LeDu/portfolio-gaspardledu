@@ -2,10 +2,10 @@
 
 # Cours introductif aux opérations statistiques de base sur R, en utilisant l'environnement RStudio. 
 # Le travail final a été réalisé par groupes de 3 sur le questionnaire ISSP 2012 - Family and Changing Gender Roles IV.
-# Le Choix du sujet était libre, à partir du moment où les opérations étudiées en cours était utilisée pour produire un raisonnement sociologique. 
+# Le Choix du sujet était libre, à partir du moment où les outils étudiées en cours étaient utilisés pour produire un raisonnement sociologique. 
 
-# Le sujet choisi visait à croiser les convictions politiques d'un couple à leur répartition des tâches ménagère. 
-# Le but étant de vérifier l’existence d’un lien significatif entre les deux variables
+# Le sujet choisi visait à croiser les convictions politiques des individus à la répartition des tâches ménagères dans leur couple. 
+# Le but était de vérifier l’existence d’un lien significatif entre les deux variables
 
 
 # On commence par l'importation des libraries et des données #
@@ -70,7 +70,7 @@ table(dataFRA$scoreCONSERV_rec)
 freq(dataFRA$scorePART)
 
 # On veut ensuite comparer le conservatisme d'un individu avec sa participation aux tâches ménagères
-# On commence par transformer score CONSERV en variable qualitative
+# On commence par transformer le score CONSERV en variable qualitative
 
 # Recodage de dataFRA$scoreCONSERV_rec en dataFRA$scoreCONSERV_rec_rec
 dataFRA$CONSERV <- dataFRA$scoreCONSERV_rec %>%
@@ -81,7 +81,7 @@ dataFRA$CONSERV <- dataFRA$scoreCONSERV_rec %>%
     "CONSERV extrême" = "[21,44]"
   )
 
-# Le score CONSERV est ensuite comparé à la participation aux tâches
+# Le score CONSERV est ensuite comparé à la participation de l'individu aux tâches ménagères
 tabV42 <- table(dataFRA$CONSERV, dataFRA$V42)
 lprop(tabV42)
 cprop(tabV42)
@@ -89,485 +89,50 @@ chisq.test(tabV42)
 cramer.v(tabV42)
 write_clip(lprop(tabV42))
 
-# On remarque alors que la répartition des tâches ménagères est répartie de manière étrange : plus le score CONSERV est minime, plus l'individu répond "MOI" à la question "Dans votre foyer, qui s'occuper des tâches suivantes ? - Laver le linge"
+# On remarque alors que les tâches ménagères en fonction des convictions sont réparties de manière étrange : plus le score CONSERV est minime, plus l'individu répond "MOI" à la question "Dans votre foyer, qui s'occuper des tâches suivantes ? - Laver le linge"
+# C'est parce qu'une variable lourde, le genre, pèse sur les réponses aux questions. Il faut donc distinguer le genre des répondants
+# On va donc regarder la répartition du genre dans l'échelle de conservatisme, puis séparer les réponses en fonction du genre
 
-tabSEX <- table(dataFRA$SEX, dataFRA$CONS)
-
+# Analyse de la répartition du genre dans l'échelle de conservatisme
+tabSEX <- table(dataFRA$SEX, dataFRA$CONSERV)
 lprop(tabSEX)
 cprop(tabSEX)
 prop(tabSEX)
-
 chisq.test(tabSEX)
 cramer.v(tabSEX)
-
 write_clip(lprop(tabSEX))
 
 
-### tentative de séparer le score CONS en fonction du genre ###
-
+# Séparation du score CONSERV en fonction du genre
 dataFEM <- subset (dataFRA, SEX  == "Female")
 dataMEN <- subset (dataFRA, SEX == "Male")
 
-tabV42 <- table(dataFEM$CONS, dataFEM$V42)
-tabV42 <- table(dataMEN$CONS, dataMEN$V42)
+# On regarde la répartition des tâches en fonction des convictions politiques, mais d'un point de vue genré cette fois
+tabV42FEM <- table(dataFEM$CONSERV, dataFEM$V42)
+tabV42MEN <- table(dataMEN$CONSERV, dataMEN$V42)
 write_clip(lprop(tabV42))
 
-## Recodage de dataFEM$V42 en dataFEM$V42_rec
-dataFEM$Linge <- dataFEM$V42 %>%
-  fct_recode(
-    "Moi" = "Always me",
-    "Moi" = "Usually me",
-    "Répartition égalitaire" = "About equal or both together",
-    "Répartition égalitaire" = "Usually my spouse/ partner",
-    "Répartition égalitaire" = "Always my spouse/ partner",
-    NULL = "Is done by a third person"
-  )
+# On se rend compte qu'il y a une grande différence femme-homme dans les résultats
+# Les répondants masculins sont très peu à répondre "moi" aux tâches ménagères, et inversement la réponse "moi" est surreprésentée chez les femmes
+# L'idéologie ne semble pas peser dans les réponses
 
-## Recodage de dataFRA$V42 en dataFRA$V42_rec
+# Pour le prouver, on va établir le coefficient de corrélation entre convictions et égalité du partage des tâches
+# Il nous faut donc deux variables quantitatives : un score de convervatisme (CONSERV) et un score d'égalité (PART)
+
+# Recodage d'une question portant sur le partage du ménage, plus la répartition est égalitaire, plus la réponse vaut des points
 dataFRA$V42_rec <- dataFRA$V42 %>%
   fct_recode(
-    "Moi" = "Always me",
-    "Moi" = "Usually me",
-    "Égalitaire" = "About equal or both together",
-    "L'autre époux.se" = "Usually my spouse/ partner",
-    "L'autre époux.se" = "Always my spouse/ partner",
-    NULL = "Is done by a third person"
-  )
-
-tabV42 <- table(dataFEM$CONS, dataFEM$Linge)
-tabV42 <- table(dataMEN$CONS, dataMEN$Linge)
-write_clip(lprop(tabV42))
-tabV42 <- table(dataFRA$CONS, dataFRA$V42_rec)
-
-fisher.test(tabSEX)
-
-tabSEX <- table(dataFRA$SEX, dataFRA$CONS)
-chisq.test(tabV42)
-cramer.v(tabV42)
-
-tab
-
-#Fatigue due aux tâche ménagères#
-
-tabV53 <- table(dataFEM$CONS, dataFEM$V53)
-tabV53 <- table(dataMEN$CONS, dataMEN$V53)
-write_clip(lprop(tabV53))
-
-freq(dataFRA$V37_rec)
-
-##Calcul tâche par tâche##
-
-irec(dataFRA$V37)
-
-## Recodage de dataFRA$V37 en dataFRA$V37_rec
-dataFEM$V37_rec <- dataFEM$V37 %>%
-  fct_recode(
-    NULL = "None, no hours, does not apply",
-    "1h ou moins" = "1 hour or less than 1 hour",
-    "1h-3h" = "2 hours",
-    "1h-3h" = "3 hours",
-    "4h-6h" = "4",
-    "4h-6h" = "5",
-    "4h-6h" = "6",
-    "7h-10h" = "7",
-    "7h-10h" = "8",
-    "7h-10h" = "9",
-    "7h-10h" = "10",
-    "11h-15h" = "11",
-    "11h-15h" = "12",
-    "11h-15h" = "13",
-    "11h-15h" = "14",
-    "11h-15h" = "15",
-    "16h-20h" = "16",
-    "16h-20h" = "17",
-    "16h-20h" = "18",
-    "16h-20h" = "19",
-    "16h-20h" = "20",
-    "21h-30h" = "21",
-    "21h-30h" = "22",
-    "21h-30h" = "23",
-    "21h-30h" = "24",
-    "21h-30h" = "25",
-    "21h-30h" = "26",
-    "21h-30h" = "27",
-    "21h-30h" = "28",
-    "21h-30h" = "29",
-    "21h-30h" = "30",
-    "31h-50h" = "31",
-    "31h-50h" = "32",
-    "31h-50h" = "33",
-    "31h-50h" = "34",
-    "31h-50h" = "35",
-    "31h-50h" = "36",
-    "31h-50h" = "37",
-    "31h-50h" = "38",
-    "31h-50h" = "39",
-    "31h-50h" = "40",
-    "31h-50h" = "41",
-    "31h-50h" = "42",
-    "31h-50h" = "43",
-    "31h-50h" = "44",
-    "31h-50h" = "45",
-    "31h-50h" = "46",
-    "31h-50h" = "47",
-    "31h-50h" = "48",
-    "31h-50h" = "49",
-    "31h-50h" = "50",
-    "Plus de 50h" = "51",
-    "Plus de 50h" = "52",
-    "Plus de 50h" = "53",
-    "Plus de 50h" = "54",
-    "Plus de 50h" = "55",
-    "Plus de 50h" = "56",
-    "Plus de 50h" = "57",
-    "Plus de 50h" = "58",
-    "Plus de 50h" = "59",
-    "Plus de 50h" = "60",
-    "Plus de 50h" = "62",
-    "Plus de 50h" = "63",
-    "Plus de 50h" = "64",
-    "Plus de 50h" = "65",
-    "Plus de 50h" = "66",
-    "Plus de 50h" = "67",
-    "Plus de 50h" = "68",
-    "Plus de 50h" = "70",
-    "Plus de 50h" = "71",
-    "Plus de 50h" = "72",
-    "Plus de 50h" = "73",
-    "Plus de 50h" = "74",
-    "Plus de 50h" = "75",
-    "Plus de 50h" = "76",
-    "Plus de 50h" = "77",
-    "Plus de 50h" = "78",
-    "Plus de 50h" = "80",
-    "Plus de 50h" = "82",
-    "Plus de 50h" = "84",
-    "Plus de 50h" = "85",
-    "Plus de 50h" = "86",
-    "Plus de 50h" = "87",
-    "Plus de 50h" = "89",
-    "Plus de 50h" = "90",
-    "Plus de 50h" = "91",
-    "Plus de 50h" = "92",
-    "Plus de 50h" = "93",
-    "Plus de 50h" = "94",
-    "Plus de 50h" = "95 hours and more"
-  )
-
-## Recodage de dataFEM$V37 en dataFEM$V37_rec
-dataMEN$V37_rec <- dataMEN$V37 %>%
-  fct_recode(
-    NULL = "None, no hours, does not apply",
-    "1" = "1 hour or less than 1 hour",
-    "2" = "2 hours",
-    "3" = "3 hours",
-    "95" = "95 hours and more"
+    "0" = "Always me",
+    "2" = "Usually me",
+    "3" = "About equal or both together",
+    "2" = "Usually my spouse/ partner",
+    "0" = "Always my spouse/ partner",
+    "0" = "Is done by a third person"
   ) %>%
   as.character() %>%
   as.numeric()
 
-tabV37 <- table(dataFRA$CONS, dataFRA$V37_rec)
-
-
-tabV37 <- table(dataMEN$CONS, dataMEN$V37_rec)
-write_clip(lprop(tabV37))
-
-summary (dataFEM$V37_rec)
-
-mean(dataMEN$V37_rec)
-median(tabV37)
-
-### Score PET ###
-
-## Recodage de dataFRA$V37 en dataFRA$V37_rec
-dataFRA$V37_rec <- dataFRA$V37 %>%
-  fct_recode(
-    "0" = "None, no hours, does not apply",
-    "0" = "1 hour or less than 1 hour",
-    "1" = "2 hours",
-    "3" = "3 hours",
-    "2" = "4",
-    "1" = "5",
-    "0" = "6",
-    "0" = "7",
-    "0" = "8",
-    "0" = "9",
-    "0" = "10",
-    "0" = "11",
-    "0" = "12",
-    "0" = "13",
-    "0" = "14",
-    "0" = "15",
-    "0" = "16",
-    "0" = "17",
-    "0" = "18",
-    "0" = "19",
-    "0" = "20",
-    "0" = "21",
-    "0" = "22",
-    "0" = "23",
-    "0" = "24",
-    "0" = "25",
-    "0" = "26",
-    "0" = "27",
-    "0" = "28",
-    "0" = "29",
-    "0" = "30",
-    "0" = "31",
-    "0" = "32",
-    "0" = "33",
-    "0" = "34",
-    "0" = "35",
-    "0" = "36",
-    "0" = "37",
-    "0" = "38",
-    "0" = "39",
-    "0" = "40",
-    "0" = "41",
-    "0" = "42",
-    "0" = "43",
-    "0" = "44",
-    "0" = "45",
-    "0" = "46",
-    "0" = "47",
-    "0" = "48",
-    "0" = "49",
-    "0" = "50",
-    "0" = "51",
-    "0" = "52",
-    "0" = "53",
-    "0" = "54",
-    "0" = "55",
-    "0" = "56",
-    "0" = "57",
-    "0" = "58",
-    "0" = "59",
-    "0" = "60",
-    "0" = "62",
-    "0" = "63",
-    "0" = "64",
-    "0" = "65",
-    "0" = "66",
-    "0" = "67",
-    "0" = "68",
-    "0" = "70",
-    "0" = "71",
-    "0" = "72",
-    "0" = "73",
-    "0" = "74",
-    "0" = "75",
-    "0" = "76",
-    "0" = "77",
-    "0" = "78",
-    "0" = "80",
-    "0" = "82",
-    "0" = "84",
-    "0" = "85",
-    "0" = "86",
-    "0" = "87",
-    "0" = "89",
-    "0" = "90",
-    "0" = "91",
-    "0" = "92",
-    "0" = "93",
-    "0" = "94",
-    "0" = "95 hours and more"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V38 en dataFRA$V38_rec
-dataFRA$V38_rec <- dataFRA$V38 %>%
-  fct_recode(
-    "0" = "None, no hours, does not apply, IN: no hours, no partner",
-    "0" = "1 hour or less than 1 hour",
-    "1" = "2 hours",
-    "3" = "3 hours",
-    "2" = "4",
-    "1" = "5",
-    "0" = "6",
-    "0" = "7",
-    "0" = "8",
-    "0" = "9",
-    "0" = "10",
-    "0" = "11",
-    "0" = "12",
-    "0" = "13",
-    "0" = "14",
-    "0" = "15",
-    "0" = "16",
-    "0" = "17",
-    "0" = "18",
-    "0" = "19",
-    "0" = "20",
-    "0" = "21",
-    "0" = "22",
-    "0" = "23",
-    "0" = "24",
-    "0" = "25",
-    "0" = "26",
-    "0" = "27",
-    "0" = "28",
-    "0" = "29",
-    "0" = "30",
-    "0" = "31",
-    "0" = "32",
-    "0" = "33",
-    "0" = "34",
-    "0" = "35",
-    "0" = "36",
-    "0" = "37",
-    "0" = "38",
-    "0" = "39",
-    "0" = "40",
-    "0" = "41",
-    "0" = "42",
-    "0" = "43",
-    "0" = "44",
-    "0" = "45",
-    "0" = "46",
-    "0" = "47",
-    "0" = "48",
-    "0" = "49",
-    "0" = "50",
-    "0" = "51",
-    "0" = "52",
-    "0" = "53",
-    "0" = "54",
-    "0" = "55",
-    "0" = "56",
-    "0" = "57",
-    "0" = "58",
-    "0" = "59",
-    "0" = "60",
-    "0" = "61",
-    "0" = "62",
-    "0" = "63",
-    "0" = "64",
-    "0" = "65",
-    "0" = "66",
-    "0" = "67",
-    "0" = "68",
-    "0" = "69",
-    "0" = "70",
-    "0" = "72",
-    "0" = "73",
-    "0" = "74",
-    "0" = "75",
-    "0" = "76",
-    "0" = "77",
-    "0" = "78",
-    "0" = "80",
-    "0" = "81",
-    "0" = "82",
-    "0" = "83",
-    "0" = "84",
-    "0" = "85",
-    "0" = "86",
-    "0" = "88",
-    "0" = "89",
-    "0" = "90",
-    "0" = "91",
-    "0" = "92",
-    "0" = "94",
-    "0" = "95 hours and more"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V39 en dataFRA$V39_rec
-dataFRA$V39_rec <- dataFRA$V39 %>%
-  fct_recode(
-    "0" = "1 hour or less than 1 hour",
-    "1" = "2 hours",
-    "3" = "3 hours",
-    "2" = "4",
-    "1" = "5",
-    "0" = "6",
-    "0" = "7",
-    "0" = "8",
-    "0" = "9",
-    "0" = "10",
-    "0" = "11",
-    "0" = "12",
-    "0" = "13",
-    "0" = "14",
-    "0" = "15",
-    "0" = "16",
-    "0" = "17",
-    "0" = "18",
-    "0" = "19",
-    "0" = "20",
-    "0" = "21",
-    "0" = "22",
-    "0" = "23",
-    "0" = "24",
-    "0" = "25",
-    "0" = "26",
-    "0" = "27",
-    "0" = "28",
-    "0" = "29",
-    "0" = "30",
-    "0" = "31",
-    "0" = "32",
-    "0" = "33",
-    "0" = "34",
-    "0" = "35",
-    "0" = "36",
-    "0" = "37",
-    "0" = "38",
-    "0" = "39",
-    "0" = "40",
-    "0" = "41",
-    "0" = "42",
-    "0" = "43",
-    "0" = "44",
-    "0" = "45",
-    "0" = "46",
-    "0" = "47",
-    "0" = "48",
-    "0" = "49",
-    "0" = "50",
-    "0" = "51",
-    "0" = "52",
-    "0" = "54",
-    "0" = "55",
-    "0" = "56",
-    "0" = "57",
-    "0" = "58",
-    "0" = "60",
-    "0" = "61",
-    "0" = "62",
-    "0" = "63",
-    "0" = "64",
-    "0" = "65",
-    "0" = "66",
-    "0" = "68",
-    "0" = "69",
-    "0" = "70",
-    "0" = "71",
-    "0" = "72",
-    "0" = "74",
-    "0" = "75",
-    "0" = "76",
-    "0" = "77",
-    "0" = "78",
-    "0" = "80",
-    "0" = "81",
-    "0" = "84",
-    "0" = "85",
-    "0" = "86",
-    "0" = "90",
-    "0" = "91",
-    "0" = "92",
-    "0" = "94",
-    "0" = "95 hours and more",
-    "0" = "None, no hours"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V41 en dataFRA$V41_rec
+# Même procédure sur une question portant sur le partage des charges financières
 dataFRA$V41_rec <- dataFRA$V41 %>%
   fct_recode(
     "0" = "I manage all and give partner his share",
@@ -579,230 +144,37 @@ dataFRA$V41_rec <- dataFRA$V41 %>%
   ) %>%
   as.character() %>%
   as.numeric()
+# etc, etc...
+# On répète le recodage sur l'ensemble des questions portant sur la répartition des tâches ménagères dans le couple
 
-## Recodage de dataFRA$V42 en dataFRA$V42_rec
-dataFRA$V42_rec <- dataFRA$V42 %>%
-  fct_recode(
-    "0" = "Always me",
-    "2" = "Usually me",
-    "3" = "About equal or both together",
-    "2" = "Usually my spouse/ partner",
-    "0" = "Always my spouse/ partner",
-    "0" = "Is done by a third person"
-  ) %>%
-  as.character() %>%
-  as.numeric()
+# Ensuite, on agrège les réponses en un score de partage égalitaire des tâches (PART)
+dataFRA$scorePART <- dataFRA$V37_rec+dataFRA$V38_rec+dataFRA$V39_rec+dataFRA$V41_rec+dataFRA$V42_rec+dataFRA$V42_rec+dataFRA$V43_rec+dataFRA$V44_rec+dataFRA$V45_rec+dataFRA$V46_rec+dataFRA$V47_rec+dataFRA$V48_rec+dataFRA$V49_rec+dataFRA$V51_rec+dataFRA$V52_rec+dataFRA$V53_rec+dataFRA$V54_rec+dataFRA$V64_rec
 
-## Recodage de dataFRA$V43 en dataFRA$V43_rec
-dataFRA$V43_rec <- dataFRA$V43 %>%
-  fct_recode(
-    "0" = "Always me",
-    "2" = "Usually me",
-    "3" = "About equal or both together",
-    "2" = "Usually my spouse/ partner",
-    "0" = "Always my spouse/ partner",
-    "0" = "Is done by a third person"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V44 en dataFRA$V44_rec
-dataFRA$V44_rec <- dataFRA$V44 %>%
-  fct_recode(
-    "0" = "Always me",
-    "2" = "Usually me",
-    "3" = "About equal or both together",
-    "2" = "Usually my spouse/ partner",
-    "0" = "Always my spouse/ partner",
-    "0" = "Is done by a third person"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V45 en dataFRA$V45_rec
-dataFRA$V45_rec <- dataFRA$V45 %>%
-  fct_recode(
-    "0" = "Always me",
-    "2" = "Usually me",
-    "3" = "About equal or both together",
-    "2" = "Usually my spouse/ partner",
-    "0" = "Always my spouse/ partner",
-    "0" = "Is done by a third person"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V46 en dataFRA$V46_rec
-dataFRA$V46_rec <- dataFRA$V46 %>%
-  fct_recode(
-    "0" = "Always me",
-    "2" = "Usually me",
-    "3" = "About equal or both together",
-    "2" = "Usually my spouse/ partner",
-    "0" = "Always my spouse/ partner",
-    "0" = "Is done by a third person"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V47 en dataFRA$V47_rec
-dataFRA$V47_rec <- dataFRA$V47 %>%
-  fct_recode(
-    "0" = "Always me",
-    "2" = "Usually me",
-    "3" = "About equal or both together",
-    "2" = "Usually my spouse/ partner",
-    "0" = "Always my spouse/ partner",
-    "0" = "Is done by a third person"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V48 en dataFRA$V48_rec
-dataFRA$V48_rec <- dataFRA$V48 %>%
-  fct_recode(
-    "0" = "I do much more than my fair share",
-    "1" = "I do a bit more than my fair share",
-    "3" = "I do roughly my fair share",
-    "1" = "I do a bit less than my fair share",
-    "0" = "I do much less than my fair share"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V49 en dataFRA$V49_rec
-dataFRA$V49_rec <- dataFRA$V49 %>%
-  fct_recode(
-    "0" = "Mostly me",
-    "0" = "Mostly my spouse/ partner",
-    "2" = "Sometimes me/ sometimes spouse, partner",
-    "3" = "We decide together",
-    "0" = "Someone else"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V51 en dataFRA$V51_rec
-dataFRA$V51_rec <- dataFRA$V51 %>%
-  fct_recode(
-    "0" = "Several times a week",
-    "3" = "Several times a month",
-    "1" = "Once or twice",
-    "0" = "Never"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V52 en dataFRA$V52_rec
-dataFRA$V52_rec <- dataFRA$V52 %>%
-  fct_recode(
-    "0" = "Several times a week",
-    "2" = "Several times a month",
-    "1" = "Once or twice",
-    "0" = "Never"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V53 en dataFRA$V53_rec
-dataFRA$V53_rec <- dataFRA$V53 %>%
-  fct_recode(
-    "0" = "Several times a week",
-    "3" = "Several times a month",
-    "1" = "Once or twice",
-    "0" = "Never"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V54 en dataFRA$V54_rec
-dataFRA$V54_rec <- dataFRA$V54 %>%
-  fct_recode(
-    "0" = "Several times a week",
-    "3" = "Several times a month",
-    "1" = "Once or twice",
-    "0" = "Never"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V64 en dataFRA$V64_rec
-dataFRA$V64_rec <- dataFRA$V64 %>%
-  fct_recode(
-    "0" = "Mostly me",
-    "0" = "Mostly my spouse/ partner",
-    "2" = "Sometimes me/ sometimes my spouse, partner",
-    "3" = "We decide/ decided together",
-    "0" = "Someone else"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-freq(dataFRA$V64_rec)
-
-
-dataFRA$scorePET <- dataFRA$V37_rec+dataFRA$V38_rec+dataFRA$V39_rec+dataFRA$V41_rec+dataFRA$V42_rec+dataFRA$V42_rec+dataFRA$V43_rec+dataFRA$V44_rec+dataFRA$V45_rec+dataFRA$V46_rec+dataFRA$V47_rec+dataFRA$V48_rec+dataFRA$V49_rec+dataFRA$V51_rec+dataFRA$V52_rec+dataFRA$V53_rec+dataFRA$V54_rec+dataFRA$V64_rec
-
-## Recodage de dataFRA$scorePET en dataFRA$scorePET_rec
-dataFRA$scorePET_rec <- cut(dataFRA$scorePET,
+# Quantilisation du score pour voir la répartition des individus le long de l'échelle
+dataFRA$scorePART_rec <- cut(dataFRA$scorePART,
   include.lowest = TRUE,
   right = FALSE,
   dig.lab = 4,
   breaks = c(10, 23, 26, 29.75, 40)
 )
 
-## Recodage de dataFRA$scorePET_rec en dataFRA$scorePET_rec_rec
-dataFRA$PET <- dataFRA$scorePET_rec %>%
-  fct_recode(
-    "Score minime" = "[10,23)",
-    "Score faible" = "[23,26)",
-    "Score moyen" = "[26,29.75)",
-    "Score élevé" = "[29.75,40]"
-  )
+# On étudie 
+tabCONSERVPART <- table(dataFRA$scoreCONSERV, dataFRA$scorePART)
+write_clip(table(dataFRA$scoreCONSERV, dataFRA$scorePART))
+chisq.test(tabCONSERVPART)
+cramer.v(tabCONSERVPART)
 
-tabCONSPET <- table(dataFRA$scoreCONS, dataFRA$scorePET)
-
-write_clip(table(dataFRA$scoreCONS, dataFRA$scorePET))
-chisq.test(tabCONSPET)
-cramer.v(tabCONSPET)
-
-is.numeric(dataFRA$scoreCONS)
-is.numerc
-
-plot(dataFRA$scoreCONS, dataFRA$scorePET, 
+plot(dataFRA$scoreCONSERV, dataFRA$scorePARTT, 
      main = "Partage égalitaire des tâches & Conservatisme",
      xlab = "Score de conservatisme",
      ylab = "Score de partage égalitaire des tâches")
 
-cor(dataFRA$scoreCONS, dataFRA$scorePET, use = "complete.obs")
-reg <- lm(dataFRA$scorePET ~ dataFRA$scoreCONS)
+cor(dataFRA$scoreCONSERV, dataFRA$scorePART, use = "complete.obs")
+reg <- lm(dataFRA$scorePART ~ dataFRA$scoreCONSERV)
 summary(reg)
 abline(reg, col ="red")
 
-tabV42 <- table(dataFRA$CONS, dataFRA$V42_RE)
-## Recodage de dataFRA$V42 en dataFRA$V42_rec
-dataFRA$V42_RE <- dataFRA$V42 %>%
-  fct_recode(
-    "Moi" = "Always me",
-    "Moi" = "Usually me",
-    "Égalitaire" = "About equal or both together",
-    "L'autre époux.se" = "Usually my spouse/ partner",
-    "L'autre époux.se" = "Always my spouse/ partner",
-    NULL = "Is done by a third person"
-  )
 
-write_clip(lprop(tab))
-
-chisq.test(tabV42)
-cramer.v(tabV42)
-
-icut(dataFRA$scoreCONS)
-tab <- table(dataFRA$SEX, dataFRA$PET)
-
-tabV42 <- table(dataFRA$CONS, dataFRA$V42_rec)
-write_clip(lprop(tabV42))
-chisq.test(tabV42)
-cramer.v(tabV42)
 
 #### QUI SONT LES HYPOCRITES ####
 
@@ -827,117 +199,5 @@ dataFRA$FR_DEGR_rec <- dataFRA$FR_DEGR %>%
     "Master" = "University"
   )
 
-irec(dataFRA$FR_INC)
-irec(dataFRA$FR_INC_rec)
-
-## Recodage de dataFRA$FR_INC_rec en dataFRA$FR_INC_rec_rec
-dataFRA$FR_INC_rec_rec <- dataFRA$FR_INC_rec %>%
-  fct_recode(
-    "Moins de 2000 euros" = "Pas de revenu",
-    "Moins de 2000 euros" = "En dessous du seuil de pauvreté",
-    "Moins de 2000 euros" = "Entre 1000 et 1500 euros",
-    "Moins de 2000 euros" = "Entre 1500 et 2000 euros",
-    "Plus de 3000 euros" = "Entre 3000 et 5000 euros",
-    "Plus de 3000 euros" = "Entre 5000 et 10000 euros",
-    "Plus de 3000 euros" = "plus de 10k",
-    "Plus de 3000 euros" = "plus de 25k",
-    "Plus de 3000 euros" = "plus de 50k"
-  )
-
-irec(dataFRA$AGE)
-
-## Recodage de dataFRA$AGE en dataFRA$AGE_rec
-dataFRA$AGE_rec <- dataFRA$AGE %>%
-  fct_recode(
-    "Moins de 25 ans" = "15 years",
-    "Moins de 25 ans" = "16 years",
-    "Moins de 25 ans" = "17 years",
-    "Moins de 25 ans" = "18 years",
-    "Moins de 25 ans" = "19",
-    "Moins de 25 ans" = "20",
-    "Moins de 25 ans" = "21",
-    "Moins de 25 ans" = "22",
-    "Moins de 25 ans" = "23",
-    "Moins de 25 ans" = "24",
-    "Moins de 25 ans" = "25",
-    "25-30 ans" = "26",
-    "25-30 ans" = "27",
-    "25-30 ans" = "28",
-    "25-30 ans" = "29",
-    "25-30 ans" = "30",
-    "30-40 ans" = "31",
-    "30-40 ans" = "32",
-    "30-40 ans" = "33",
-    "30-40 ans" = "34",
-    "30-40 ans" = "35",
-    "30-40 ans" = "36",
-    "30-40 ans" = "37",
-    "30-40 ans" = "38",
-    "30-40 ans" = "39",
-    "30-40 ans" = "40",
-    "40-50 ans" = "41",
-    "40-50 ans" = "42",
-    "40-50 ans" = "43",
-    "40-50 ans" = "44",
-    "40-50 ans" = "45",
-    "40-50 ans" = "46",
-    "40-50 ans" = "47",
-    "40-50 ans" = "48",
-    "40-50 ans" = "49",
-    "40-50 ans" = "50",
-    "50-60 ans" = "51",
-    "50-60 ans" = "52",
-    "50-60 ans" = "53",
-    "50-60 ans" = "54",
-    "50-60 ans" = "55",
-    "50-60 ans" = "56",
-    "50-60 ans" = "57",
-    "50-60 ans" = "58",
-    "50-60 ans" = "59",
-    "50-60 ans" = "60",
-    "60-70 ans" = "61",
-    "60-70 ans" = "62",
-    "60-70 ans" = "63",
-    "60-70 ans" = "64",
-    "60-70 ans" = "65",
-    "60-70 ans" = "66",
-    "60-70 ans" = "67",
-    "60-70 ans" = "68",
-    "60-70 ans" = "69",
-    "60-70 ans" = "70",
-    "Plus de 70 ans" = "71",
-    "Plus de 70 ans" = "72",
-    "Plus de 70 ans" = "73",
-    "Plus de 70 ans" = "74",
-    "Plus de 70 ans" = "75",
-    "Plus de 70 ans" = "76",
-    "Plus de 70 ans" = "77",
-    "Plus de 70 ans" = "78",
-    "Plus de 70 ans" = "79",
-    "Plus de 70 ans" = "80",
-    "Plus de 70 ans" = "81",
-    "Plus de 70 ans" = "82",
-    "Plus de 70 ans" = "83",
-    "Plus de 70 ans" = "84",
-    "Plus de 70 ans" = "85",
-    "Plus de 70 ans" = "86",
-    "Plus de 70 ans" = "87",
-    "Plus de 70 ans" = "88",
-    "Plus de 70 ans" = "89",
-    "Plus de 70 ans" = "90",
-    "Plus de 70 ans" = "91",
-    "Plus de 70 ans" = "92",
-    "Plus de 70 ans" = "93",
-    "Plus de 70 ans" = "94",
-    "Plus de 70 ans" = "95",
-    "Plus de 70 ans" = "96",
-    "Plus de 70 ans" = "97",
-    "Plus de 70 ans" = "98",
-    "Plus de 70 ans" = "101",
-    "Plus de 70 ans" = "102 years"
-  )
-
-tabHYPO <- table(dataFRA$Hypo, dataFRA$EDUCYRS)
-write_clip(lprop(tabHYPO))
-
-irec(dataFRA$ISCO88)
+tabCONTRA <- table(dataFRA$CONTRA, dataFRA$EDUCYRS)
+write_clip(lprop(tabCONTRA))
