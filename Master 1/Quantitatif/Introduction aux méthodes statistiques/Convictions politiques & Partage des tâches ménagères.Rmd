@@ -1,7 +1,5 @@
 # Introduction aux méthodes statistiques
 
-\textcolor{blue}{bleu}
-
 # Cours introductif aux opérations statistiques de base sur R, en utilisant l'environnement RStudio. 
 # Le travail final a été réalisé par groupes de 3 sur le questionnaire ISSP 2012 - Family and Changing Gender Roles IV.
 # Le Choix du sujet était libre, à partir du moment où les opérations étudiées en cours était utilisée pour produire un raisonnement sociologique. 
@@ -10,7 +8,7 @@
 # Le but étant de vérifier l’existence d’un lien significatif entre les deux variables
 
 
-# Importation & Nettoyage des données #
+# On commence par le Setup de R et l'importation des données #
 
 library(foreign)
 library(questionr)
@@ -20,9 +18,11 @@ library(clipr)
 dataTTL <- read.spss("C:/Users/gsprd/.../DATA.sav", to.data.fram = TRUE)
 dataFRA <- subset(dataTTL, V3 == "FR-France")
 
-# Recodage #
+# Ensuite, on recode des réponses au questionnaire
+# On cherche à établir une échelle de conservatisme, en attribuant des points de conservatisme à certaines réponses
+# Exemple : "Le rôle d’un homme, c’est de gagner l’argent du ménage ; le rôle d’une femme, c’est de s’occuper de la maison et de la famille" (Question 2)
 
-## Recodage de dataFRA$V7 en dataFRA$V7_rec
+# Recodage de dataFRA$V7 en dataFRA$V7_rec
 dataFRA$V7_rec <- dataFRA$V7 %>%
   fct_recode(
     "4" = "Strongly agree",
@@ -34,7 +34,7 @@ dataFRA$V7_rec <- dataFRA$V7 %>%
   as.character() %>%
   as.numeric()
 
-## Recodage de dataFRA$V8 en dataFRA$V8_rec
+# Recodage de dataFRA$V8 en dataFRA$V8_rec
 dataFRA$V8_rec <- dataFRA$V8 %>%
   fct_recode(
     "4" = "Strongly agree",
@@ -46,174 +46,15 @@ dataFRA$V8_rec <- dataFRA$V8 %>%
   as.character() %>%
   as.numeric()
 
-## Recodage de dataFRA$V9 en dataFRA$V9_rec
-dataFRA$V9_rec <- dataFRA$V9 %>%
-  fct_recode(
-    "3" = "Strongly agree",
-    "2" = "Agree",
-    "1" = "Neither agree nor disagree",
-    "0" = "Disagree",
-    "0" = "Strongly disagree"
-  ) %>%
-  as.character() %>%
-  as.numeric()
+# On compile le score obtenu à chaque réponse pour chaque individu
+dataFRA$scoreCONSERV <- dataFRA$V7_rec+dataFRA$V8_rec+dataFRA$V9_rec+dataFRA$V10_rec+dataFRA$V11_rec+dataFRA$V15_rec+dataFRA$V16_rec+dataFRA$V17_rec+dataFRA$V19_rec+dataFRA$V20_rec+dataFRA$V31_rec+dataFRA$V32_rec+dataFRA$FR_PRTY_rec+dataFRA$PARTY_LR_rec
 
-## Recodage de dataFRA$V10 en dataFRA$V10_rec
-dataFRA$V10_rec <- dataFRA$V10 %>%
-  fct_recode(
-    "0" = "Strongly agree",
-    "0" = "Agree",
-    "1" = "Neither agree nor disagree",
-    "2" = "Disagree",
-    "3" = "Strongly disagree"
-  ) %>%
-  as.character() %>%
-  as.numeric()
+# Premières analyses de l'échelle de conservatisme
+freq(dataFRA$scoreCONSERV)
+table(dataFRA$scoreCONSERV)
 
-## Recodage de dataFRA$V11 en dataFRA$V11_rec
-dataFRA$V11_rec <- dataFRA$V11 %>%
-  fct_recode(
-    "4" = "Strongly agree",
-    "3" = "Agree",
-    "1" = "Neither agree nor disagree",
-    "0" = "Disagree",
-    "0" = "Strongly disagree"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V15 en dataFRA$V15_rec
-dataFRA$V15_rec <- dataFRA$V15 %>%
-  fct_recode(
-    "4" = "Strongly agree",
-    "3" = "Agree",
-    "1" = "Neither agree nor disagree",
-    "0" = "Disagree",
-    "0" = "Strongly disagree"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V16 en dataFRA$V16_rec
-dataFRA$V16_rec <- dataFRA$V16 %>%
-  fct_recode(
-    "0" = "Strongly agree",
-    "0" = "Agree",
-    "1" = "Neither agree nor disagree",
-    "3" = "Disagree",
-    "4" = "Strongly disagree"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V17 en dataFRA$V17_rec
-dataFRA$V17_rec <- dataFRA$V17 %>%
-  fct_recode(
-    "0" = "Strongly agree",
-    "0" = "Agree",
-    "0" = "Neither agree nor disagree",
-    "1" = "Disagree",
-    "2" = "Strongly disagree"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V19 en dataFRA$V19_rec
-dataFRA$V19_rec <- dataFRA$V19 %>%
-  fct_recode(
-    "0" = "Strongly agree",
-    "0" = "Agree",
-    "1" = "Neither agree nor disagree",
-    "3" = "Disagree",
-    "4" = "Strongly disagree"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V20 en dataFRA$V20_rec
-dataFRA$V20_rec <- dataFRA$V20 %>%
-  fct_recode(
-    "0" = "Strongly agree",
-    "0" = "Agree",
-    "1" = "Neither agree nor disagree",
-    "3" = "Disagree",
-    "4" = "Strongly disagree"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V31 en dataFRA$V31_rec
-dataFRA$V31_rec <- dataFRA$V31 %>%
-  fct_recode(
-    "3" = "Mother at home, father full-time",
-    "2" = "Mother part-time, father full-time",
-    "0" = "Both, mother and father full-time",
-    "0" = "Both, mother and father part-time",
-    "0" = "Father part-time, mother full-time",
-    "0" = "Father at home, mother full-time, ES: not asked"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$V32 en dataFRA$V32_rec
-dataFRA$V32_rec <- dataFRA$V32 %>%
-  fct_recode(
-    "3" = "Mother at home, father full-time",
-    "2" = "Mother part-time, father full-time",
-    "0" = "Both, mother and father full-time",
-    "0" = "Both, mother and father part-time",
-    "0" = "Father part-time, mother full-time",
-    "0" = "Father at home, mother full-time, ES: not asked"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$FR_PRTY en dataFRA$FR_PRTY_rec
-dataFRA$FR_PRTY_rec <- dataFRA$FR_PRTY %>%
-  fct_recode(
-    "0" = "Worker's Struggle - LO - Nathalie Arthaud, far left",
-    "0" = "New Anticapitalist Party - NPA - Philippe Poutou",
-    "0" = "Left Front - FG - Jean-Luc Mélenchon",
-    "0" = "Socialist Party - PS - Francois Hollande",
-    "0" = "Green Party - EELV - Eva Joly",
-    "1" = "Democratic Movement - MoDem - François Bayrou",
-    "2" = "Union for a Popular Movement - UMP - Nicolas Sarkozy",
-    "3" = "Arise the Republic - DLR - Nicolas Dupont-Aignan",
-    "3" = "National front - FN - Marine Le Pen",
-    "3" = "Solidarity and Progress - Jacques Cheminade",
-    NULL = "Invalid ballot"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-## Recodage de dataFRA$PARTY_LR en dataFRA$PARTY_LR_rec
-dataFRA$PARTY_LR_rec <- dataFRA$PARTY_LR %>%
-  fct_recode(
-    "0" = "Far left (communist etc.)",
-    "0" = "Left, center left",
-    "1" = "Center, liberal",
-    "3" = "Right, conservative",
-    "5" = "Far right (fascist etc.)",
-    NULL = "Other",
-    NULL = "None",
-    NULL = "PH: No particular party, but special leaders (individual-related) of parties",
-    NULL = "Invalid ballot"
-  ) %>%
-  as.character() %>%
-  as.numeric()
-
-### Agrégation en score CONS ###
-
-dataFRA$scoreCONS <- dataFRA$V7_rec+dataFRA$V8_rec+dataFRA$V9_rec+dataFRA$V10_rec+dataFRA$V11_rec+dataFRA$V15_rec+dataFRA$V16_rec+dataFRA$V17_rec+dataFRA$V19_rec+dataFRA$V20_rec+dataFRA$V31_rec+dataFRA$V32_rec+dataFRA$FR_PRTY_rec+dataFRA$PARTY_LR_rec
-
-freq(dataFRA$scoreCONS)
-table(dataFRA$scoreCONS)
-
-freq(dataFRA$scorePET)
-
-#Quantilisation du score avec icut#
-
-## Recodage de dataFRA$scoreCONS en dataFRA$scoreCONS_rec
+# Quantilisation de l'échelle #
+# Recodage de dataFRA$scoreCONSERV en dataFRA$scoreCONSERV_rec
 dataFRA$scoreCONS_rec <- cut(dataFRA$scoreCONS,
                              include.lowest = TRUE,
                              right = FALSE,
@@ -221,7 +62,12 @@ dataFRA$scoreCONS_rec <- cut(dataFRA$scoreCONS,
                              breaks = c(0, 8, 14, 21, 44)
 )
 
-freq(dataFRA$scoreCONS_rec)
+# Analyses de l'échelle simplifiée
+freq(dataFRA$scoreCONSERV_rec)
+table(dataFRA$scoreCONSERV_rec)
+
+# À UTILISER + TARD
+freq(dataFRA$scorePART)
 
 #On transformer score CONS en variable qualitative#
 
