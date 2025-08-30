@@ -1,7 +1,8 @@
 # Introduction aux méthodes statistiques
 
+\textcolor{blue}{bleu}
 
-### Cours introductif aux opérations statistiques de base sur R, en utilisant l'environnement RStudio. 
+# Cours introductif aux opérations statistiques de base sur R, en utilisant l'environnement RStudio. 
 # Le travail final a été réalisé par groupes de 3 sur le questionnaire ISSP 2012 - Family and Changing Gender Roles IV.
 # Le Choix du sujet était libre, à partir du moment où les opérations étudiées en cours était utilisée pour produire un raisonnement sociologique. 
 
