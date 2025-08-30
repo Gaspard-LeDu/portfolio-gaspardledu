@@ -8,8 +8,7 @@
 # Le but étant de vérifier l’existence d’un lien significatif entre les deux variables
 
 
-# On commence par le Setup de R et l'importation des données #
-
+# On commence par l'importation des libraries et des données #
 library(foreign)
 library(questionr)
 library(forcats)
@@ -18,9 +17,9 @@ library(clipr)
 dataTTL <- read.spss("C:/Users/gsprd/.../DATA.sav", to.data.fram = TRUE)
 dataFRA <- subset(dataTTL, V3 == "FR-France")
 
-# Ensuite, on recode des réponses au questionnaire
-# On cherche à établir une échelle de conservatisme, en attribuant des points de conservatisme à certaines réponses
-# Exemple : "Le rôle d’un homme, c’est de gagner l’argent du ménage ; le rôle d’une femme, c’est de s’occuper de la maison et de la famille" (Question 2)
+# On cherche d'abord à établir une échelle de conservatisme, en attribuant des points de conservatisme à certaines réponses
+# On recode donc certaines réponses au questionnaire en variables quantitatives
+# Exemple : "Le rôle d’un homme, c’est de gagner l’argent du ménage ; le rôle d’une femme, c’est de s’occuper de la maison et de la famille" (Question 2 - 0 à 4 points)
 
 # Recodage de dataFRA$V7 en dataFRA$V7_rec
 dataFRA$V7_rec <- dataFRA$V7 %>%
@@ -45,8 +44,9 @@ dataFRA$V8_rec <- dataFRA$V8 %>%
   ) %>%
   as.character() %>%
   as.numeric()
+# etc, etc...
 
-# On compile le score obtenu à chaque réponse pour chaque individu
+# On additionne ensuite tous les points obtenus pour former une échelle de conservatisme (échelle CONSERV)
 dataFRA$scoreCONSERV <- dataFRA$V7_rec+dataFRA$V8_rec+dataFRA$V9_rec+dataFRA$V10_rec+dataFRA$V11_rec+dataFRA$V15_rec+dataFRA$V16_rec+dataFRA$V17_rec+dataFRA$V19_rec+dataFRA$V20_rec+dataFRA$V31_rec+dataFRA$V32_rec+dataFRA$FR_PRTY_rec+dataFRA$PARTY_LR_rec
 
 # Premières analyses de l'échelle de conservatisme
@@ -62,38 +62,34 @@ dataFRA$scoreCONS_rec <- cut(dataFRA$scoreCONS,
                              breaks = c(0, 8, 14, 21, 44)
 )
 
-# Analyses de l'échelle simplifiée
+# Analyses de l'échelle quantilisée
 freq(dataFRA$scoreCONSERV_rec)
 table(dataFRA$scoreCONSERV_rec)
 
 # À UTILISER + TARD
 freq(dataFRA$scorePART)
 
-#On transformer score CONS en variable qualitative#
+# On veut ensuite comparer le conservatisme d'un individu avec sa participation aux tâches ménagères
+# On commence par transformer score CONSERV en variable qualitative
 
-## Recodage de dataFRA$scoreCONS_rec en dataFRA$scoreCONS_rec_rec
-dataFRA$CONS <- dataFRA$scoreCONS_rec %>%
+# Recodage de dataFRA$scoreCONSERV_rec en dataFRA$scoreCONSERV_rec_rec
+dataFRA$CONSERV <- dataFRA$scoreCONSERV_rec %>%
   fct_recode(
-    "CONS zéro" = "[0,8)",
-    "CONS faibles" = "[8,14)",
-    "CONS élevés" = "[14,21)",
-    "CONS extrêmes" = "[21,44]"
+    "CONSERV minime" = "[0,8)",
+    "CONSERV faible" = "[8,14)",
+    "CONSERV élevé" = "[14,21)",
+    "CONSERV extrême" = "[21,44]"
   )
 
-###Comparer le score CONS avec la répartition des tâches ménagères###
-#Première tâche problème de genre, répartition toujours inégale mais différente#
-
-tabV42 <- table(dataFRA$CONS, dataFRA$V42)
-
+# Le score CONSERV est ensuite comparé à la participation aux tâches
+tabV42 <- table(dataFRA$CONSERV, dataFRA$V42)
 lprop(tabV42)
 cprop(tabV42)
-
 chisq.test(tabV42)
 cramer.v(tabV42)
-
 write_clip(lprop(tabV42))
 
-#On remarque une inégale répartition genrée quelle que soit la catégorie#
+# On remarque alors que la répartition des tâches ménagères est répartie de manière étrange : plus le score CONSERV est minime, plus l'individu répond "MOI" à la question "Dans votre foyer, qui s'occuper des tâches suivantes ? - Laver le linge"
 
 tabSEX <- table(dataFRA$SEX, dataFRA$CONS)
 
