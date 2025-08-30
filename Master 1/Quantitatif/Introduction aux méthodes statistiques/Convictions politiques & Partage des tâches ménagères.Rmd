@@ -1,14 +1,9 @@
+# Introduction aux méthodes statistiques
 
-## Introduction aux méthodes statistiques
+- Cours introductif aux opérations statistiques de base sur R, en utilisant l'environnement RStudio. Le travail final a été réalisé par groupes de 3 sur le questionnaire ISSP 2012 - Family and Changing Gender Roles IV.
+- Le Choix du sujet était libre, à partir du moment où les opérations étudiées en cours était utilisée pour produire un raisonnement sociologique. Le sujet choisi visait à croiser les convictions politiques d'un couple à leur répartition des tâches ménagère. Le but étant de vérifier l’existence d’un lien significatif entre les deux variables
 
- - Cours introductif aux opérations statistiques de base sur R, en utilisant l'environnement RStudio
- - Travail final réalisé par groupes de 3 sur le questionnaire ISSP 2012 - Family and Changing Gender Roles IV
-
-- Choix du sujet libre, à partir du moment où les opérations étudiées en cours était utilisée pour produire un raisonnement sociologique
-- Sujet choisi vise à croiser les convictions politiques d'un couple à leur répartition des tâches ménagère
-- Le but étant de vérifier l’existence d’un lien significatif entre les deux variables ##
-
-### Importation des données ###
+## Importation & Nettoyage des données ##
 
 library(foreign)
 library(questionr)
